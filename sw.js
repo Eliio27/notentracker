@@ -1,11 +1,11 @@
-const CACHE_NAME = 'notentracker-v1';
+const CACHE_NAME = 'notentracker-v2';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
-        '/Notentracker/',
-        '/Notentracker/index.html',
+        '/notentracker/',
+        '/notentracker/index.html',
       ]);
     })
   );
