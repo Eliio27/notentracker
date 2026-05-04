@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react';
-import { getTest, deleteTest, getSubjects } from '../db';
+import { getTest, deleteTest } from '../db';
 import { gradeColor, formatDate, getSubjectColor } from '../utils';
 
-export default function TestDetail({ testId, onBack }) {
+export default function TestDetail({ testId, onBack, subjects, semesters }) {
   const [test, setTest] = useState(null);
-  const [subjects, setSubjects] = useState([]);
   const [showPhoto, setShowPhoto] = useState(false);
 
   useEffect(() => {
-    Promise.all([getTest(testId), getSubjects()]).then(([t, s]) => {
-      setTest(t);
-      setSubjects(s);
-    });
+    getTest(testId).then(setTest);
   }, [testId]);
 
   const handleDelete = async () => {
@@ -24,6 +20,7 @@ export default function TestDetail({ testId, onBack }) {
 
   const subject = subjects.find((s) => s.id === test.subjectId);
   const subjectIndex = subjects.findIndex((s) => s.id === test.subjectId);
+  const semester = semesters.find((s) => s.id === subject?.semesterId);
 
   return (
     <>
@@ -38,6 +35,12 @@ export default function TestDetail({ testId, onBack }) {
       </div>
 
       <div className="card">
+        {semester && (
+          <div className="detail-row">
+            <span className="detail-label">Semester</span>
+            <span>{semester.name}</span>
+          </div>
+        )}
         <div className="detail-row">
           <span className="detail-label">Fach</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

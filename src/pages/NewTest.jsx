@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { getSubjects, addTest } from '../db';
+import { useState } from 'react';
+import { addTest } from '../db';
 
-export default function NewTest({ onAdded }) {
-  const [subjects, setSubjects] = useState([]);
+export default function NewTest({ onAdded, semesters, subjects, activeSemester }) {
+  const defaultSemId = activeSemester?.id || (semesters[0]?.id ?? '');
+  const [semesterId, setSemesterId] = useState(defaultSemId);
   const [title, setTitle] = useState('');
   const [subjectId, setSubjectId] = useState('');
   const [grade, setGrade] = useState('');
@@ -12,12 +13,15 @@ export default function NewTest({ onAdded }) {
   const [notes, setNotes] = useState('');
   const [photo, setPhoto] = useState(null);
 
-  useEffect(() => {
-    getSubjects().then((s) => {
-      setSubjects(s);
-      if (s.length > 0) setSubjectId(String(s[0].id));
-    });
-  }, []);
+  const semSubjects = subjects.filter((s) => s.semesterId === Number(semesterId));
+
+  // Setze erstes Fach wenn Semester wechselt
+  const currentSubjectValid = semSubjects.some((s) => s.id === Number(subjectId));
+  const effectiveSubjectId = currentSubjectValid ? subjectId : (semSubjects[0]?.id ?? '');
+
+  if (!currentSubjectValid && semSubjects.length > 0 && subjectId !== String(semSubjects[0].id)) {
+    // will update on next render
+  }
 
   const handlePhoto = (e) => {
     const file = e.target.files?.[0];
@@ -29,13 +33,14 @@ export default function NewTest({ onAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !subjectId || !grade) return;
+    const sid = effectiveSubjectId || subjectId;
+    if (!title || !sid || !grade) return;
     const g = parseFloat(grade);
     if (g < 1 || g > 6) return;
 
     await addTest({
       title,
-      subjectId: Number(subjectId),
+      subjectId: Number(sid),
       grade: g,
       points: points ? parseFloat(points) : null,
       maxPoints: maxPoints ? parseFloat(maxPoints) : null,
@@ -46,105 +51,128 @@ export default function NewTest({ onAdded }) {
     onAdded();
   };
 
+  if (semesters.length === 0) {
+    return (
+      <>
+        <h1>Neuer Test</h1>
+        <div className="empty">Erstelle zuerst ein Semester unter "Verwalten".</div>
+      </>
+    );
+  }
+
   return (
     <>
       <h1>Neuer Test</h1>
 
-      {subjects.length === 0 ? (
-        <div className="empty">Erstelle zuerst ein Fach unter "Fächer".</div>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Titel</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="z.B. Elektrotechnik Prüfung 1"
-              required
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        {/* Semester-Auswahl (für Nachtragen) */}
+        <div className="form-group">
+          <label>Semester {semesterId != activeSemester?.id && <span style={{ color: 'var(--yellow)', fontSize: 11 }}> (Nachtragen)</span>}</label>
+          <select value={semesterId} onChange={(e) => { setSemesterId(e.target.value); setSubjectId(''); }}>
+            {semesters.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}{s.active ? ' (aktiv)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div className="form-group">
-            <label>Fach</label>
-            <select value={subjectId} onChange={(e) => setSubjectId(e.target.value)}>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Note (1.0 – 6.0)</label>
-            <input
-              type="number"
-              min="1"
-              max="6"
-              step="0.1"
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              placeholder="4.5"
-              required
-            />
-          </div>
-
-          <div className="inline-row">
+        {semSubjects.length === 0 ? (
+          <div className="empty">Keine Fächer in diesem Semester. Erstelle Fächer unter "Verwalten".</div>
+        ) : (
+          <>
             <div className="form-group">
-              <label>Punkte (optional)</label>
+              <label>Fach</label>
+              <select value={effectiveSubjectId} onChange={(e) => setSubjectId(e.target.value)}>
+                {semSubjects.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Titel</label>
               <input
-                type="number"
-                min="0"
-                step="0.5"
-                value={points}
-                onChange={(e) => setPoints(e.target.value)}
-                placeholder="38"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="z.B. Elektrotechnik Prüfung 1"
+                required
               />
             </div>
+
             <div className="form-group">
-              <label>Max. Punkte</label>
+              <label>Note (1.0 – 6.0)</label>
               <input
                 type="number"
-                min="0"
-                step="0.5"
-                value={maxPoints}
-                onChange={(e) => setMaxPoints(e.target.value)}
-                placeholder="45"
+                min="1"
+                max="6"
+                step="0.1"
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                placeholder="4.5"
+                required
               />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label>Datum</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
+            <div className="inline-row">
+              <div className="form-group">
+                <label>Punkte (optional)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={points}
+                  onChange={(e) => setPoints(e.target.value)}
+                  placeholder="38"
+                />
+              </div>
+              <div className="form-group">
+                <label>Max. Punkte</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={maxPoints}
+                  onChange={(e) => setMaxPoints(e.target.value)}
+                  placeholder="45"
+                />
+              </div>
+            </div>
 
-          <div className="form-group">
-            <label>Notizen</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Freitext..."
-            />
-          </div>
+            <div className="form-group">
+              <label>Datum</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
 
-          <div className="form-group">
-            <label>Foto (optional)</label>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePhoto}
-            />
-            {photo && <img src={photo} alt="Vorschau" className="photo-preview" />}
-          </div>
+            <div className="form-group">
+              <label>Notizen</label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Freitext..."
+              />
+            </div>
 
-          <button type="submit" className="btn btn-primary">Test speichern</button>
-        </form>
-      )}
+            <div className="form-group">
+              <label>Foto (optional)</label>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhoto}
+              />
+              {photo && <img src={photo} alt="Vorschau" className="photo-preview" />}
+            </div>
+
+            <button type="submit" className="btn btn-primary">Test speichern</button>
+          </>
+        )}
+      </form>
     </>
   );
 }

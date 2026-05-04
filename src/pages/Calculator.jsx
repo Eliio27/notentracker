@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import { getSubjects, getTestsBySubject } from '../db';
+import { getTestsBySubject } from '../db';
 import { average, gradeColor } from '../utils';
 
-export default function Calculator() {
-  const [subjects, setSubjects] = useState([]);
+export default function Calculator({ activeSemester, subjects }) {
   const [subjectId, setSubjectId] = useState('');
   const [currentGrades, setCurrentGrades] = useState([]);
   const [targetGrade, setTargetGrade] = useState('');
   const [remaining, setRemaining] = useState('');
 
+  const semSubjects = subjects.filter((s) => s.semesterId === activeSemester?.id);
+
   useEffect(() => {
-    getSubjects().then((s) => {
-      setSubjects(s);
-      if (s.length > 0) setSubjectId(String(s[0].id));
-    });
-  }, []);
+    if (semSubjects.length > 0 && !subjectId) {
+      setSubjectId(String(semSubjects[0].id));
+    }
+  }, [semSubjects]);
 
   useEffect(() => {
     if (!subjectId) return;
@@ -44,18 +44,30 @@ export default function Calculator() {
     }
   }
 
+  if (!activeSemester) {
+    return (
+      <>
+        <h1>Notenrechner</h1>
+        <div className="empty">Erstelle zuerst ein Semester unter "Verwalten".</div>
+      </>
+    );
+  }
+
   return (
     <>
       <h1>Notenrechner</h1>
+      <div style={{ color: 'var(--text2)', fontSize: 13, marginBottom: 16 }}>
+        {activeSemester.name}
+      </div>
 
-      {subjects.length === 0 ? (
-        <div className="empty">Erstelle zuerst ein Fach unter "Fächer".</div>
+      {semSubjects.length === 0 ? (
+        <div className="empty">Keine Fächer im aktiven Semester.</div>
       ) : (
         <>
           <div className="form-group">
             <label>Fach</label>
             <select value={subjectId} onChange={(e) => setSubjectId(e.target.value)}>
-              {subjects.map((s) => (
+              {semSubjects.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
@@ -104,7 +116,7 @@ export default function Calculator() {
           )}
 
           {result && result.reachable && (
-            <div className={`result ${result.needed > 5 ? '' : ''}`}>
+            <div className="result">
               {result.easy ? (
                 <>Deine Wunschnote ist bereits gesichert, selbst mit der Minimalnote 1.0.</>
               ) : (

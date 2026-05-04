@@ -411,3 +411,81 @@ h2 {
   margin-top: 8px;
   white-space: pre-wrap;
 }
+
+/* ---- Semester Switch ---- */
+.semester-switch {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+}
+
+.semester-switch::-webkit-scrollbar {
+  display: none;
+}
+
+.sem-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--surface2);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.sem-chip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(233, 69, 96, 0.1);
+}
+
+.sem-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+/* ---- Badge aktiv ---- */
+.badge-active {
+  display: inline-block;
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Semester aktivieren Button ---- */
+.activate-btn {
+  background: none;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 10px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.activate-btn:active {
+  background: rgba(46, 204, 113, 0.15);
+}
