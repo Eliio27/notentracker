@@ -489,3 +489,121 @@ h2 {
 .activate-btn:active {
   background: rgba(46, 204, 113, 0.15);
 }
+
+/* ---- Login Screen ---- */
+.login-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.login-icon {
+  margin-bottom: 20px;
+}
+
+.login-icon svg {
+  border-radius: 18px;
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-label {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--surface2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+}
+
+.login-error {
+  color: var(--red);
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-hint {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ---- Offline / Sync Banner ---- */
+.offline-banner {
+  position: fixed;
+  top: var(--safe-top);
+  left: 0;
+  right: 0;
+  background: rgba(231, 76, 60, 0.9);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  padding: 6px 16px;
+  z-index: 200;
+  backdrop-filter: blur(8px);
+}
+
+.sync-banner {
+  position: fixed;
+  top: var(--safe-top);
+  left: 0;
+  right: 0;
+  background: rgba(46, 204, 113, 0.9);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  padding: 6px 16px;
+  z-index: 200;
+  backdrop-filter: blur(8px);
+}

@@ -1,31 +1,28 @@
-import { useEffect, useState } from 'react';
-import { getTest, deleteTest } from '../db';
-import { gradeColor, formatDate, getSubjectColor } from '../utils';
+import { useEffect, useState } from 'react'
+import { getTest, deleteTest } from '../api'
+import { gradeColor, formatDate, getSubjectColor } from '../utils'
 
 export default function TestDetail({ testId, onBack, subjects, semesters }) {
-  const [test, setTest] = useState(null);
-  const [showPhoto, setShowPhoto] = useState(false);
+  const [test, setTest] = useState(null)
+  const [showPhoto, setShowPhoto] = useState(false)
 
-  useEffect(() => {
-    getTest(testId).then(setTest);
-  }, [testId]);
+  useEffect(() => { getTest(testId).then(setTest) }, [testId])
 
   const handleDelete = async () => {
-    if (!confirm('Test wirklich löschen?')) return;
-    await deleteTest(testId);
-    onBack();
-  };
+    if (!confirm('Test wirklich löschen?')) return
+    await deleteTest(testId)
+    onBack()
+  }
 
-  if (!test) return null;
+  if (!test) return <div className="empty" style={{ marginTop: 40 }}>Lädt…</div>
 
-  const subject = subjects.find((s) => s.id === test.subjectId);
-  const subjectIndex = subjects.findIndex((s) => s.id === test.subjectId);
-  const semester = semesters.find((s) => s.id === subject?.semesterId);
+  const subject = subjects.find((s) => s.id === test.subjectId)
+  const subjectIndex = subjects.findIndex((s) => s.id === test.subjectId)
+  const semester = semesters.find((s) => s.id === subject?.semesterId)
 
   return (
     <>
       <button className="back-btn" onClick={onBack}>← Zurück</button>
-
       <h1>{test.title}</h1>
 
       <div className="card" style={{ textAlign: 'center' }}>
@@ -80,5 +77,5 @@ export default function TestDetail({ testId, onBack, subjects, semesters }) {
         Test löschen
       </button>
     </>
-  );
+  )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTestsBySubject } from '../db';
+import { getTestsBySubject } from '../api';
 import { average, gradeColor } from '../utils';
 
 export default function Calculator({ activeSemester, subjects }) {
